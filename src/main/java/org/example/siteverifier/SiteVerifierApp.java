@@ -19,33 +19,34 @@ public class SiteVerifierApp extends RecursiveAction
     private final int start;
     private final int length;
     private final Set<String> outSites;
+    private final int threshold;
 
-    private static final int ACTION_THRESHOLD = 3;
-
-    public SiteVerifierApp(List<String> inSites, int start, int length, Set<String> outSites)
+    public SiteVerifierApp(List<String> inSites, int start, int length, Set<String> outSites, int threshold)
     {
         this.inSites = inSites;
         this.start = start;
         this.length = length;
         this.outSites = outSites;
+        this.threshold = threshold;
     }
 
     public static void main(String[] args) throws Exception
     {
-        if (args.length != 2)
+        if (args.length != 3)
         {
-            System.out.println("Usage: java -jar app.jar in-sites.txt out-sites.txt");
+            System.out.println("Usage: <INPUT_FILE> <OUTPUT_FILE> <THRESHOLD>");
             System.exit(1);
             return;
         }
 
         Path inSitesPath = Path.of(args[0]);
         Path outSitesPath = Path.of(args[1]);
+        int threshold = Integer.parseInt(args[2]);
 
         List<String> inSites = Collections.unmodifiableList(Files.readAllLines(inSitesPath));
         Set<String> outSites = new HashSet<>();
         ForkJoinPool pool = new ForkJoinPool();
-        pool.invoke(new SiteVerifierApp(inSites, 0, inSites.size(), outSites));
+        pool.invoke(new SiteVerifierApp(inSites, 0, inSites.size(), outSites, threshold));
 
         Files.write(outSitesPath, outSites);
     }
@@ -53,7 +54,7 @@ public class SiteVerifierApp extends RecursiveAction
     @Override
     protected void compute()
     {
-        if (length < ACTION_THRESHOLD)
+        if (length < threshold)
         {
             computeDirectly();
             return;
@@ -61,8 +62,8 @@ public class SiteVerifierApp extends RecursiveAction
 
         int split = length / 2;
         invokeAll(
-                new SiteVerifierApp(inSites, start, split, outSites),
-                new SiteVerifierApp(inSites, start + split, length - split, outSites));
+                new SiteVerifierApp(inSites, start, split, outSites, threshold),
+                new SiteVerifierApp(inSites, start + split, length - split, outSites, threshold));
     }
 
     private void computeDirectly()
