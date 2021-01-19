@@ -1,0 +1,5 @@
+.idea/
+.gradle/
+build/
+in-sites.txt
+out-sites.txt
