@@ -78,7 +78,7 @@ public class SiteVerifierApp extends RecursiveAction
             }
             catch (MalformedURLException e)
             {
-                System.out.println("Invalid URL: " + rawUrl);
+                System.out.println("Error! Invalid URL - " + rawUrl);
                 continue;
             }
 
@@ -89,7 +89,7 @@ public class SiteVerifierApp extends RecursiveAction
             }
             catch (IOException e)
             {
-                System.out.println("Unable to open connection with " + rawUrl);
+                System.out.println("Error! Unable to open connection with " + rawUrl);
                 continue;
             }
 
@@ -99,11 +99,12 @@ public class SiteVerifierApp extends RecursiveAction
             }
             catch (IOException e)
             {
-                System.out.println("Unable to connect to " + rawUrl);
+                System.out.println("Error! Unable to connect to " + rawUrl);
                 continue;
             }
 
             outSites.add(rawUrl);
+            System.out.println("Success! Verified URL - " + rawUrl);
         }
     }
 }
